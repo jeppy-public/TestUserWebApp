@@ -1,0 +1,19 @@
+vaadin:
+  launch-browser: true
+spring:
+  application:
+    name: TestManulifeUserWebApp
+  datasource:
+    url: jdbc:h2:mem:mydb
+    #url: jdbc:h2:file:~/test2
+    #url: jdbc:h2:./H2_datas/sampledata
+    #url: jdbc:h2:file:D:/H2datas/sampledata
+    #url: jdbc:h2:tcp://localhost/D:/H2datas/sampledata
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  jpa:
+    show-sql: true
+  h2:
+    console:
+      enabled: true
