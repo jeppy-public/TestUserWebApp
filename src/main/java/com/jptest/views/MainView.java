@@ -3,55 +3,41 @@ package com.jptest.views;
 import com.jptest.entity.User;
 import com.jptest.enums.UserStatus;
 import com.jptest.service.UserService;
+import com.jptest.util.ReportGenerator;
+import com.jptest.views.form.UserForm;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Route
-@UIScope // Ensures a separate instance for each UI
+@UIScope
 @Component
 public class MainView extends VerticalLayout {
     private final UserService userService;
     private final Grid<User> userGrid = new Grid<>(User.class);
-    private final TextField userIDField = new TextField("User ID");
-    private final TextField nameField = new TextField("Name");
-    private final TextField emailField = new TextField("Email");
-    private final TextField statusField = new TextField("Status");
-    private final Button addButton = new Button("Add User");
-    private final Button updateButton = new Button("Update User");
-    private final Button clearButton = new Button("Clear");
-
+    private final UserForm userForm;
     private User selectedUser;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss");
-
     @Autowired
-    public MainView(UserService userService) {
+    public MainView(UserService userService, ReportGenerator reportGenerator) {
         this.userService = userService;
+        this.userForm = new UserForm(userService, this::updateGrid, reportGenerator);
 
         // Initialize layout
         setSizeFull();
         configureGrid();
-        configureForm();
-
-        add(userGrid, new FormLayout(userIDField, nameField, emailField, addButton, updateButton, clearButton));
-
+        add(userGrid, userForm);
         updateGrid();
     }
 
     private void configureGrid() {
-        configureButtonTheme();
         configureColumns();
         configureCreateDateColumn();
         configureUpdateDateColumn();
@@ -59,18 +45,19 @@ public class MainView extends VerticalLayout {
         configureSelectionListener();
     }
 
-    private void configureButtonTheme(){
-        addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        updateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        clearButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-    }
-
     private void configureColumns(){
         userGrid.setColumns("userID", "name", "email", "status", "createBy", "updateBy");
+
+        userGrid.getColumnByKey("userID").setWidth("80px");
+        userGrid.getColumnByKey("name").setWidth("200px");
+        userGrid.getColumnByKey("email").setAutoWidth(true);
+        userGrid.getColumnByKey("status").setWidth("100px");
+        userGrid.getColumnByKey("createBy").setWidth("80px");
+        userGrid.getColumnByKey("updateBy").setWidth("80px");
     }
 
     private void configureCreateDateColumn() {
-        userGrid.addColumn(user -> user.getCreateDate() != null ? user.getCreateDate().format(formatter) : "")
+        userGrid.addColumn(user -> user.getCreateDate() != null ? user.getCreateDate().format(UserForm.FORMATTER) : "")
                 .setHeader("Create Date")
                 .setWidth("200px")
                 .setFlexGrow(0)
@@ -84,7 +71,7 @@ public class MainView extends VerticalLayout {
     }
 
     private void configureUpdateDateColumn() {
-        userGrid.addColumn(user -> user.getUpdateDate() != null ? user.getUpdateDate().format(formatter) : "")
+        userGrid.addColumn(user -> user.getUpdateDate() != null ? user.getUpdateDate().format(UserForm.FORMATTER) : "")
                 .setHeader("Update Date")
                 .setWidth("200px")
                 .setFlexGrow(0)
@@ -111,87 +98,24 @@ public class MainView extends VerticalLayout {
         user.setUpdateBy("admin");
         userService.save(user);
         updateGrid();
-        clearForm();
+        userForm.clearForm();
         Notification.show("User marked as Deleted");
     }
 
     private void configureSelectionListener() {
-        //userGrid.asSingleSelect().addValueChangeListener(event -> handleUserSelection(event.getValue()));
         userGrid.asSingleSelect().addValueChangeListener(
                 event -> {
                     selectedUser = event.getValue();
                     if(selectedUser != null){
-                        populateForm(selectedUser);
+                        userForm.populateForm(selectedUser);
                     } else {
-                        clearForm();
+                        userForm.clearForm();
                     }
                 }
         );
     }
 
-    private void populateForm(User user) {
-        userIDField.setValue(user.getUserID());
-        userIDField.setEnabled(false);
-        nameField.setValue(user.getName());
-        emailField.setValue(user.getEmail());
-        statusField.setValue(user.getStatus().getLabel());
-        updateButton.setEnabled(true);
-    }
-
-    private void configureForm() {
-        addButton.addClickListener(event -> {
-            if (!nameField.isEmpty() && !emailField.isEmpty()) {
-
-                if(userService.findByUserIDAndStatusActive(userIDField.getValue()) != null){
-                    Notification.show("UserID already exists", 3000, Notification.Position.MIDDLE);
-                    return;
-                }
-
-                User user = new User();
-                user.setUserID(userIDField.getValue());
-                user.setName(nameField.getValue());
-                user.setEmail(emailField.getValue());
-                user.setStatus(UserStatus.ACTIVE);
-                user.setCreateDate(LocalDateTime.now());
-                user.setCreateBy("admin");
-                userService.save(user);
-                updateGrid();
-                clearForm();
-                Notification.show("User added");
-            } else {
-                Notification.show("Please fill in all fields", 3000, Notification.Position.MIDDLE);
-            }
-        });
-
-        updateButton.addClickListener( event ->{
-            if(selectedUser != null){
-                selectedUser.setName(nameField.getValue());
-                selectedUser.setEmail(emailField.getValue());
-                selectedUser.setUpdateDate(LocalDateTime.now());
-                selectedUser.setUpdateBy("Admin");
-                userService.save(selectedUser);
-                updateGrid();
-                clearForm();
-                Notification.show("User updated");
-            }
-
-        });
-
-        clearButton.addClickListener(event -> clearForm());
-
-        updateButton.setEnabled(false);
-    }
-
     private void updateGrid() {
         userGrid.setItems(userService.findAllUser());
-    }
-
-    private void clearForm(){
-        userIDField.clear();
-        nameField.clear();
-        emailField.clear();
-        selectedUser = null;
-        userIDField.setEnabled(true);
-        updateButton.setEnabled(false);
     }
 }
