@@ -1,5 +1,10 @@
 package com.jptest.enums;
 
+/**
+ * UserStatus class show status of a user
+ * Active -> 1
+ * Deleted -> 0
+ */
 public enum UserStatus {
     ACTIVE(1, "Active"),
     DELETED(0, "Deleted");

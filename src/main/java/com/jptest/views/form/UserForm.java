@@ -22,6 +22,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * The UserForm class represents a form for creating, updating, and clearing user information.
+ * It includes fields for user ID, name, and email, along with buttons for adding, updating,
+ * clearing the form, and generating a user report.
+ * The form integrates with the UserService to perform user operations and the ReportGenerator
+ * to create and download a user report.
+ */
 public class UserForm extends FormLayout {
     private final TextField userIDField = new TextField("User ID");
     private final TextField nameField = new TextField("Name");
@@ -45,6 +52,14 @@ public class UserForm extends FormLayout {
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss");
 
+    /**
+     * Constructs a UserForm with the given UserService, Runnable to update the grid,
+     * and ReportGenerator for generating user reports.
+     *
+     * @param userService the service responsible for user operations
+     * @param onGridUpdate a callback that triggers a grid update after user operations
+     * @param reportGenerator the generator responsible for creating user reports
+     */
     public UserForm(UserService userService, Runnable onGridUpdate, ReportGenerator reportGenerator) {
         this.userService = userService;
         this.onGridUpdate = onGridUpdate;
@@ -62,16 +77,26 @@ public class UserForm extends FormLayout {
         add(userIDField, nameField, emailField, buttonLayout, downloadLink);
     }
 
+    /**
+     * Configures the data binder to bind form fields to the User object.
+     */
     private void configureBinder() {
         userBinder.bindFields(userIDField, nameField, emailField);
     }
 
+    /**
+     * Configures the theme variants for the buttons in the form.
+     */
     private void configureButtonTheme(){
         addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         updateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         clearButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     }
 
+    /**
+     * Configures the form by adding click listeners to the buttons, setting the button layout,
+     * and making sure the update button is initially disabled.
+     */
     private void configureForm() {
         addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         updateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -90,9 +115,13 @@ public class UserForm extends FormLayout {
         buttonLayout.add(new HorizontalLayout(addButton, updateButton, reportButton), clearButton);
     }
 
+    /**
+     * Handles the adding of a new user. The user is validated, created, and saved
+     * using the UserService. The form is cleared and the grid is updated afterward.
+     */
     private void handleAddUser() {
         if(userBinder.validate()){
-            if (userService.findByUserIDAndStatusActive(userIDField.getValue()) != null) {
+            if (userService.findByUserIDAndStatusActive(userIDField.getValue()).isPresent()) {
                 Notification.show("UserID already exists", 3000, Notification.Position.MIDDLE);
                 return;
             }
@@ -117,6 +146,10 @@ public class UserForm extends FormLayout {
         }
     }
 
+    /**
+     * Handles updating an existing user's information. The selected user is validated and saved,
+     * and the form is cleared afterward.
+     */
     private void handleUpdateUser() {
         if (selectedUser != null && userBinder.validate()) {
             try{
@@ -135,6 +168,10 @@ public class UserForm extends FormLayout {
         }
     }
 
+    /**
+     * Generates a report for all users, creating a PDF file and making it available for download.
+     * The report is generated using the ReportGenerator and the download link is displayed.
+     */
     private void generateReport() {
         try {
             // Fetch the list of users
@@ -156,6 +193,11 @@ public class UserForm extends FormLayout {
         }
     }
 
+    /**
+     * Populates the form with the details of the selected user. The form will be in "update" mode.
+     *
+     * @param user the user whose details will be populated into the form
+     */
     public void populateForm(User user) {
         selectedUser = user;
         userBinder.readBean(user);
@@ -163,6 +205,9 @@ public class UserForm extends FormLayout {
         updateButton.setEnabled(true);
     }
 
+    /**
+     * Clears the form and resets the state. It also disables the update button.
+     */
     public void clearForm() {
         userBinder.clear();
         selectedUser = null;

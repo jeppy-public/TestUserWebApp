@@ -21,6 +21,9 @@ target/
 *.iml
 *.ipr
 
+# Ignore generated Javadocs
+docs
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

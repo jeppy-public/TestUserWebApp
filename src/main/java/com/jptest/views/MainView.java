@@ -16,6 +16,12 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+/**
+ * The MainView class represents the main user interface for displaying and managing users.
+ * It includes a grid displaying user data, a form for adding and updating users,
+ * and a delete functionality.
+ * The view integrates with the UserService to fetch user data and perform CRUD operations.
+ */
 @Route
 @UIScope
 @Component
@@ -25,6 +31,12 @@ public class MainView extends VerticalLayout {
     private final UserForm userForm;
     private User selectedUser;
 
+    /**
+     * Constructs a MainView instance with the given UserService and ReportGenerator.
+     *
+     * @param userService the service responsible for user operations
+     * @param reportGenerator the report generator for user-related reports
+     */
     @Autowired
     public MainView(UserService userService, ReportGenerator reportGenerator) {
         this.userService = userService;
@@ -37,6 +49,9 @@ public class MainView extends VerticalLayout {
         updateGrid();
     }
 
+    /**
+     * Configures the grid by setting up columns, date columns, delete button, and selection listener.
+     */
     private void configureGrid() {
         configureColumns();
         configureCreateDateColumn();
@@ -45,6 +60,9 @@ public class MainView extends VerticalLayout {
         configureSelectionListener();
     }
 
+    /**
+     * Configures the basic columns of the grid including userID, name, email, status, createBy, and updateBy.
+     */
     private void configureColumns(){
         userGrid.setColumns("userID", "name", "email", "status", "createBy", "updateBy");
 
@@ -56,6 +74,9 @@ public class MainView extends VerticalLayout {
         userGrid.getColumnByKey("updateBy").setWidth("80px");
     }
 
+    /**
+     * Configures the "Create Date" column to display formatted dates and allow sorting.
+     */
     private void configureCreateDateColumn() {
         userGrid.addColumn(user -> user.getCreateDate() != null ? user.getCreateDate().format(UserForm.FORMATTER) : "")
                 .setHeader("Create Date")
@@ -70,6 +91,9 @@ public class MainView extends VerticalLayout {
                 });
     }
 
+    /**
+     * Configures the "Update Date" column to display formatted dates and allow sorting.
+     */
     private void configureUpdateDateColumn() {
         userGrid.addColumn(user -> user.getUpdateDate() != null ? user.getUpdateDate().format(UserForm.FORMATTER) : "")
                 .setHeader("Update Date")
@@ -84,6 +108,10 @@ public class MainView extends VerticalLayout {
                 });
     }
 
+    /**
+     * Configures a "Delete" button column for each user in the grid.
+     * The button allows marking a user as deleted.
+     */
     private void configureDeleteButtonColumn() {
         userGrid.addComponentColumn(user -> {
             Button deleteButton = new Button("Delete");
@@ -92,7 +120,13 @@ public class MainView extends VerticalLayout {
         });
     }
 
-    private void handleDeleteUser(User user) {
+    /**
+     * Handles the deletion of a user by marking their status as DELETED and updating their details.
+     * It also refreshes the grid and clears the form.
+     *
+     * @param user the user to be deleted
+     */
+    protected void handleDeleteUser(User user) {
         user.setStatus(UserStatus.DELETED);
         user.setUpdateDate(LocalDateTime.now());
         user.setUpdateBy("admin");
@@ -102,6 +136,10 @@ public class MainView extends VerticalLayout {
         Notification.show("User marked as Deleted");
     }
 
+    /**
+     * Configures a listener to handle user selection from the grid.
+     * When a user is selected, the form is populated with the user's details.
+     */
     private void configureSelectionListener() {
         userGrid.asSingleSelect().addValueChangeListener(
                 event -> {
@@ -115,6 +153,9 @@ public class MainView extends VerticalLayout {
         );
     }
 
+    /**
+     * Updates the grid by setting its items to the list of all users fetched from the user service.
+     */
     private void updateGrid() {
         userGrid.setItems(userService.findAllUser());
     }
