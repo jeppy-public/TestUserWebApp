@@ -6,7 +6,9 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,16 @@ public class ReportGenerator {
 
         // Create a data source from the user list
         JRBeanCollectionDataSource userListDataSource = new JRBeanCollectionDataSource(userList);
+
+        // Dummy data
+        //List<User> dummyUser = new ArrayList<>();
+        /*JRBeanCollectionDataSource userListDataSource = null;
+        try{
+            dummyUser = UserHelper.getDummyUser();
+            userListDataSource = new JRBeanCollectionDataSource(dummyUser);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }*/
 
         // Add parameters if required (e.g., title, additional info)
         Map<String, Object> parameters = new HashMap<>();

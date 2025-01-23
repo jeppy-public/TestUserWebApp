@@ -28,4 +28,13 @@ public enum UserStatus {
         }
         throw new IllegalArgumentException("Invalid value for UserStatus: " + value);
     }
+
+    public static UserStatus fromLabel(String label) {
+        for (UserStatus status : UserStatus.values()) {
+            if (status.label.equalsIgnoreCase(label)) {
+                return status;
+            }
+        }
+        throw new IllegalArgumentException("Unknown label: " + label);
+    }
 }
