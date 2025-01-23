@@ -21,6 +21,8 @@ public class UserBinder {
                 .asRequired("User ID is required")
                 .withValidator(userID -> userID.length() >= 5 && userID.length() <= 9,
                         "User ID must be between 5 and 9 characters")
+                .withValidator(userID -> userID.matches("^[a-zA-Z0-9]+$"),
+                        "User ID must not contain special characters or spaces")
                 .bind(User::getUserID, User::setUserID);
 
         // Name validation: Minimum 3, maximum 35 characters
@@ -28,6 +30,8 @@ public class UserBinder {
                 .asRequired("Name is required")
                 .withValidator(name -> name.length() >= 3 && name.length() <= 35,
                         "Name must be between 3 and 35 characters")
+                .withValidator(name -> name.matches("^[a-zA-Z ]+$"),
+                        "Name must not contain special characters")
                 .bind(User::getName, User::setName);
 
         // Email validation: Valid email format
