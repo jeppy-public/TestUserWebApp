@@ -23,6 +23,13 @@ Execute the application from \src\main\java\com.jptest.TestUserWebAppApplication
 ## Database configuration
 Create In Memory H2 database with the name `mydb`.
 
+## Execute Test Suite
+Execute the application from \src\test\java\com.jptest.AllTestSuite.
+The test is meant for BackEnd module
+- User Service
+- User Repository
+- Report Generator
+
 ## Usage
 Run the project through the IDE and head out to [http://localhost:8080](http://localhost:8080)
 
@@ -32,10 +39,9 @@ run this command in the command line:
 ```
 mvn spring-boot:run
 ```
-
-## Execute Test Suite
-Execute the application from \src\test\java\com.jptest.AllTestSuite.
-The test is meant for BackEnd module
-- User Service
-- User Repository
-- Report Generator
+## Functionality
+- Add User
+- Update User
+- Delete USer
+- List User
+- Generate PDF Report of User
