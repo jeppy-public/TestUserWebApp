@@ -45,6 +45,10 @@ to
 <field name="status" class="com.jptest.enums.UserStatus"/>
 ```
 
+## Report PDF
+
+![img.png](img.png)
+
 ## Execute Test Suite
 Execute the application from \src\test\java\com.jptest.AllTestSuite.
 The test is meant for BackEnd module
@@ -61,9 +65,11 @@ run this command in the command line:
 ```
 mvn spring-boot:run
 ```
+
 ## Functionality
 - Add User
 - Update User
 - Delete USer
 - List User
 - Generate PDF Report of User
+
