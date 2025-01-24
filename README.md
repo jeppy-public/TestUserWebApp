@@ -72,4 +72,4 @@ mvn spring-boot:run
 - Delete USer
 - List User
 - Generate PDF Report of User
-
+![Image](https://github.com/user-attachments/assets/955f7b4b-718b-433d-9521-67e813addb12)
