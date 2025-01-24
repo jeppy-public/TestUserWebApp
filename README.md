@@ -23,6 +23,28 @@ Execute the application from \src\main\java\com.jptest.TestUserWebAppApplication
 ## Database configuration
 Create In Memory H2 database with the name `mydb`.
 
+## Report
+Report template is located at \src\main\resources\reports\user_report.jrxml. To open and preview the report template you can use  [Jaspersoft Studio](https://www.jaspersoft.com/products/jaspersoft-community).   
+
+## Preview on Jaspersoft Studio
+To preview it, you need to replace the text **com.jptest.enums.UserStatus** into **java.lang.String**. The reason because field status of User entity is using type **com.jptest.enums.UserStatus** and that type not recognized by jaspersoft studio, so need to replace it temporarily with known type like **java.lang.String**.
+```
+<field name="status" class="com.jptest.enums.UserStatus"/>
+```
+to
+```
+<field name="status" class="java.lang.String"/>
+```
+
+And after finish preview and do stuff in the jaspersoft studio, you need to replace back the type that you change before 
+```
+<field name="status" class="java.lang.String"/>
+```
+to
+```
+<field name="status" class="com.jptest.enums.UserStatus"/>
+```
+
 ## Execute Test Suite
 Execute the application from \src\test\java\com.jptest.AllTestSuite.
 The test is meant for BackEnd module
